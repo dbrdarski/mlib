@@ -29,7 +29,6 @@ var store = Redux.createStore(counter)
 var Template = {
   view: (vnode) => m('div#app', vnode.children)
 };
-
 const Hello = {
   view: (vnode) => m('div', `Hello, ${vnode.attrs.params.id}`)
 }
@@ -65,22 +64,25 @@ const root = [
     ])
   ])
 ];
+// var App = {
+//   view: m(Router)
+// }
+const App = () => {
+  const { component, params } = R.getRoute();
+  const state = store.getState();
+  return m(
+    Template,
+    m(component, {
+      params,
+      counter: state
+    })
+  );
+};
+
 
 function render() {
-  console.log('RENDER')
-  const { component, params } = R.getRoute();
-  m.render(
-    document.body,
-    m(
-      Template,
-      m(component, {
-        params,
-        counter: store.getState()
-      })
-    )
-  )
+  m.render( document.body, App() );
 }
-// render()
 
 const R = Router(root, {
   onMatch: render
