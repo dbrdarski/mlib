@@ -48,12 +48,12 @@ var Counter = {
 
 const root = [
   r('/users', {
-    resolve: ($) => !isUserLogged() ? $.redirect('/login') : $.continue(), // next(), return()
-    onmatch: () => new Promise(
-      (res, rej) => {
-        setTimeout(res, 500)
-      }
-    )
+    // resolve: ($) => !isUserLogged() ? $.redirect('/login') : $.continue(), // next(), return()
+    // onmatch: () => new Promise(
+    //   (res, rej) => {
+    //     setTimeout(res, 500)
+    //   }
+    // )
   }, [
     r('/', Counter),
     r('/:id', Hello),
