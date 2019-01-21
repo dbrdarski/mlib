@@ -66,8 +66,9 @@ const root = [
   ])
 ];
 
-function render(params={}, component) {
+function render() {
   console.log('RENDER')
+  const { component, params } = R.getRoute();
   m.render(
     document.body,
     m(
@@ -82,7 +83,7 @@ function render(params={}, component) {
 // render()
 
 const R = Router(root, {
-  onMatch: (req) => render(req.params, req.match.component)
+  onMatch: render
 });
 
 store.subscribe(render)

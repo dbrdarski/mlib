@@ -97,10 +97,17 @@ const resolve = (routes, req) => {
   return Promise.reject({ match: false });
 }
 const Router = (routes, { onMatch, on404 }) => {
+  let state = {};
   const router = {
+    getRoute: () => ({
+      path: state.path,
+      component: state.match.component,
+      params: state.params
+    }),
     match: (path) => resolve(routes, new Request(path))
       .then((req) => {
-        ( onMatch || console.log )(req)
+        state = req;
+        ( onMatch || console.log )()
         window.history.pushState({}, '', req.path);
       })
       .catch((error) => ( on404 || console.log )({error}))
