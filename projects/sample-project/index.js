@@ -2,30 +2,10 @@ import { r, Router } from 'mlib/router';
 import m from 'mithril';
 import Redux from 'redux';
 
-// var script = document.createElement('script');
-// script.src = "https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.js";
-// document.getElementsByTagName('head')[0].appendChild(script);
+var script = document.createElement('script');
+script.src = "https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.js";
+document.getElementsByTagName('head')[0].appendChild(script);
 
-const root = [
-  r('/users', {
-    resolve: ($) => !isUserLogged() ? $.redirect('/login') : $.continue(), // next(), return()
-    onmatch: () => new Promise(
-      (res, rej) => {
-        setTimeout(res, 3000)
-      }
-    )
-  }, [
-    r('/', {}),
-    r('/:id', {}),
-    r('/:id/:filter', {}),
-    r('/:userId', [
-      r('/posts/:postId', {}),
-      r('/photos/:imageId', {})
-    ])
-  ])
-];
-
-const R = Router(root);
 
 // R.go('/users/dane');
 
@@ -47,6 +27,13 @@ function counter(state, action) {
 var store = Redux.createStore(counter)
 
 var Template = {
+  view: (vnode) => m('div#app', vnode.children)
+};
+
+const Hello = {
+  view: (vnode) => m('div', `Hello, ${vnode.attrs.params.id}`)
+}
+var Counter = {
   view: (vnode) => m(
     'div', [
       m('span#value', `${vnode.attrs.counter} times`),
@@ -59,8 +46,43 @@ var Template = {
     ]
   )
 }
-function render() {
-  m.render(document.body, m(Template, {counter: store.getState()}))
+
+const root = [
+  r('/users', {
+    // resolve: ($) => !isUserLogged() ? $.redirect('/login') : $.continue(), // next(), return()
+    // onmatch: () => new Promise(
+    //   (res, rej) => {
+    //     setTimeout(res, 3000)
+    //   }
+    // )
+  }, [
+    r('/', Counter),
+    r('/:id', Hello),
+    r('/:id/:filter', Hello),
+    r('/:userId', [
+      r('/posts/:postId', Hello),
+      r('/photos/:imageId', Hello)
+    ])
+  ])
+];
+
+function render(params={}, component) {
+  console.log('RENDER')
+  m.render(
+    document.body,
+    m(
+      Template,
+      m(component, {
+        params,
+        counter: store.getState()
+      })
+    )
+  )
 }
-render()
+// render()
+
+const R = Router(root, {
+  onMatch: (req) => render(req.params, req.match.component)
+});
+
 store.subscribe(render)

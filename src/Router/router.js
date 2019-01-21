@@ -45,7 +45,7 @@ const route2regex = (pattern, isGroup) => {
   }
 }
 
-export const r = function(...args){
+const r = function(...args){
   const content = args.pop();
   const [ route, options ] = args;
   const isGroup = Array.isArray(content);
@@ -96,11 +96,16 @@ const resolve = (routes, req) => {
   }
   return Promise.reject({ match: false });
 }
-export const Router = (routes) => ({
+const Router = (routes, { onMatch, on404 }) => {
+  const router = {
     match: (path) => resolve(routes, new Request(path))
       .then((req) => {
-        console.log(req);
+        ( onMatch || console.log )(req)
         window.history.pushState({}, '', req.path);
       })
-      .catch((error) => console.log({error}))
-})
+      .catch((error) => ( on404 || console.log )({error}))
+  }
+  router.match(window.location.pathname)
+  return router;
+}
+export default { r, Router }
