@@ -96,17 +96,35 @@ const resolve = (routes, req) => {
   }
   return Promise.reject({ match: false });
 }
+const createState = (state, { listeners = [] } = {}) => ({
+  set: (newState) => {
+    state = newState;
+    listeners.forEach((x) => x());
+  },
+  get: () => state,
+  subscribe: (fn) => {
+    listeners = [...listeners, fn];
+    return function unsubscribe(){
+      listeners = listeners.filter( i => i !== fn)
+    };
+  }
+});
+
 const Router = (routes, { onMatch, on404 }) => {
-  let state = {};
+  let routerState = createState({});
   const router = {
-    getRoute: () => ({
-      path: state.path,
-      component: state.match.component,
-      params: state.params
-    }),
+    subscribe: routerState.subscribe,
+    getRoute: () => {
+      const state = routerState.get();
+      return {
+        path: state.path,
+        component: state.match.component,
+        params: state.params
+      };
+    },
     match: (path) => resolve(routes, new Request(path))
       .then((req) => {
-        state = req;
+        routerState.set(req);
         ( onMatch || console.log )()
         window.history.pushState({}, '', req.path);
       })

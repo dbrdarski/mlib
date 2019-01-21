@@ -48,12 +48,12 @@ var Counter = {
 
 const root = [
   r('/users', {
-    // resolve: ($) => !isUserLogged() ? $.redirect('/login') : $.continue(), // next(), return()
-    // onmatch: () => new Promise(
-    //   (res, rej) => {
-    //     setTimeout(res, 3000)
-    //   }
-    // )
+    resolve: ($) => !isUserLogged() ? $.redirect('/login') : $.continue(), // next(), return()
+    onmatch: () => new Promise(
+      (res, rej) => {
+        setTimeout(res, 500)
+      }
+    )
   }, [
     r('/', Counter),
     r('/:id', Hello),
@@ -85,7 +85,7 @@ function render() {
 }
 
 const R = Router(root, {
-  onMatch: render
+  // onMatch: render
 });
-
-store.subscribe(render)
+R.subscribe(render);
+store.subscribe(render);
