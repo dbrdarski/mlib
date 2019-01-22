@@ -94,7 +94,7 @@ const resolve = (routes, req) => {
       return Promise.resolve(req.resolve(match.route));
     }
   }
-  return Promise.reject({ match: false });
+  return Promise.reject(req.resolve(false));
 }
 const createState = (state, { listeners = [] } = {}) => ({
   set: (newState) => {
@@ -110,7 +110,19 @@ const createState = (state, { listeners = [] } = {}) => ({
   }
 });
 
-const Router = (routes, { onMatch, on404 }) => {
+(function(history){
+  var pushState = history.pushState;
+  history.pushState = function(...args) {
+      if (typeof history.onpushstate == "function") {
+          history.onpushstate(...args);
+      }
+      // ... whatever else you want to do
+      // maybe call onhashchange e.handler
+      return pushState.apply(history, arguments);
+  };
+})(window.history);
+
+const Router = (routes, notFound = "Not found.", { onMatch, on404 } = {}) => {
   let routerState = createState({});
   const router = {
     subscribe: routerState.subscribe,
@@ -122,14 +134,30 @@ const Router = (routes, { onMatch, on404 }) => {
         params: state.params
       };
     },
+    go: (url, options) => {
+      window.history.pushState({}, '', url);
+    },
     match: (path) => resolve(routes, new Request(path))
       .then((req) => {
+        console.log({req})
         routerState.set(req);
-        ( onMatch || console.log )()
-        window.history.pushState({}, '', req.path);
+        onMatch && onMatch()
+        // window.history.pushState({}, '', req.path);
       })
-      .catch((error) => ( on404 || console.log )({error}))
+      .catch(
+        ({match, path}) => {
+          routerState.set({
+            path,
+            match: {
+              component: {
+                view: () => m('div', 'Not found.')
+              }
+            }
+          });
+        }
+      )
   }
+  window.onpopstate = history.onpushstate = (state, name, path) => router.match(path);
   router.match(window.location.pathname)
   return router;
 }

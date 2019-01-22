@@ -26,11 +26,34 @@ function counter(state, action) {
 
 var store = Redux.createStore(counter)
 
+var Link = {
+  view: ({attrs: {to, onclick, ...attrs }, children}) => m('a', {
+    ...attrs,
+    href: to,
+    onclick: (e) => {
+      onclick && onclick(e);
+      e.preventDefault();
+      window.history.pushState({}, '', to);
+    }
+  }, children)
+}
+const users = {
+  dane: "Dane",
+  nom: 'Naumche'
+}
+
+const sayHi = (key) => m(Link, {to: `/users/${key}`}, `Say hi to ${users[key]}`);
+
 var Template = {
   view: (vnode) => m('div#app', vnode.children)
 };
 const Hello = {
-  view: (vnode) => m('div', `Hello, ${vnode.attrs.params.id}`)
+  view: (vnode) => m('div', [
+    m('p', `Hello, ${users[vnode.attrs.params.id]}`),
+    m(Link, {to: `/users/pero`}, `Say hi to Pero`),
+    sayHi('dane'),
+    sayHi('nom')
+  ])
 }
 var Counter = {
   view: (vnode) => m(
@@ -70,6 +93,7 @@ const root = [
 const App = () => {
   const { component, params } = R.getRoute();
   const state = store.getState();
+  console.log({ component, params, state })
   return m(
     Template,
     m(component, {
@@ -84,8 +108,6 @@ function render() {
   m.render( document.body, App() );
 }
 
-const R = Router(root, {
-  // onMatch: render
-});
+const R = Router(root);
 R.subscribe(render);
 store.subscribe(render);
