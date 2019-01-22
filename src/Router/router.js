@@ -149,9 +149,7 @@ const Router = (routes, notFound = "Not found.", { onMatch, on404 } = {}) => {
           routerState.set({
             path,
             match: {
-              component: {
-                view: () => m('div', 'Not found.')
-              }
+              component: notFound
             }
           });
         }

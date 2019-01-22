@@ -42,29 +42,40 @@ const users = {
   nom: 'Naumche'
 }
 
-const sayHi = (key) => m(Link, {to: `/users/${key}`}, `Say hi to ${users[key]}`);
+const sayHi = (key) => m(Link, {to: `/users/${key}`}, `Say hi to ${users[key]}!`);
 
 var Template = {
   view: (vnode) => m('div#app', vnode.children)
 };
-const Hello = {
-  view: (vnode) => m('div', [
-    m('p', `Hello, ${users[vnode.attrs.params.id]}`),
-    m(Link, {to: `/users/pero`}, `Say hi to Pero`),
+const UserList = {
+  view: () => m('nav', [
     sayHi('dane'),
     sayHi('nom')
   ])
 }
+const NotFound = {
+  view: () => m('div', [
+    m('p', 'Not found!!!!!!!'),
+    m(UserList)
+  ])
+}
+const Hello = {
+  view: (vnode) => m('div', [
+    m('p', `Hello, ${users[vnode.attrs.params.id]}!!!`),
+    m(UserList)
+  ])
+}
 var Counter = {
   view: (vnode) => m(
-    'div', [
+    'nav', [
       m('span#value', `${vnode.attrs.counter} times`),
       m('button#inc', {
         onclick: () => store.dispatch({ type: 'INCREMENT' })
       }, '+'),
       m('button#dec', {
         onclick: () => store.dispatch({ type: 'DECREMENT' })
-      }, '-')
+      }, '-'),
+      m(UserList)
     ]
   )
 }
@@ -108,6 +119,6 @@ function render() {
   m.render( document.body, App() );
 }
 
-const R = Router(root);
+const R = Router(root, NotFound);
 R.subscribe(render);
 store.subscribe(render);
