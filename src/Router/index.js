@@ -130,33 +130,35 @@ const Router = (routes, notFound = "Not found.", { onMatch, on404 } = {}) => {
       const state = routerState.get();
       return {
         path: state.path,
-        component: state.match.component,
+        component: state.match && state.match.component,
         params: state.params
       };
     },
-    go: (url, options) => {
-      window.history.pushState({}, '', url);
-    },
-    match: (path) => resolve(routes, new Request(path))
-      .then((req) => {
-        console.log({req})
-        routerState.set(req);
-        onMatch && onMatch()
-        // window.history.pushState({}, '', req.path);
-      })
-      .catch(
-        ({match, path}) => {
-          routerState.set({
-            path,
-            match: {
-              component: notFound
-            }
-          });
-        }
-      )
+    // go: (url, options) => {
+    //   window.history.pushState({}, '', url);
+    // },
+    match: (path) => {
+      routerState.get().path !== path && resolve(routes, new Request(path))
+        .then((req) => {
+          routerState.set(req);
+          onMatch && onMatch()
+          window.location.pathname !== req.path && window.history.pushState({}, '', req.path);
+        })
+        .catch(
+          ({match, path}) => {
+            routerState.set({
+              path,
+              match: {
+                component: notFound
+              }
+            });
+          }
+        )
+      ;
+    }
   }
   window.onpopstate = history.onpushstate = (state, name, path) => router.match(path);
-  router.match(window.location.pathname)
+  router.match(window.location.pathname);
   return router;
 }
-export default { r, Router }
+module.exports = { r, Router }

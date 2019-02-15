@@ -1,0 +1,26 @@
+{
+  "name": "sample-project",
+  "version": "0.0.1",
+  "description": "Sample Project for mlib",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dane Brdarski",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^9.4.7",
+    "babel-preset-env": "^1.7.0",
+    "parcel-bundler": "^1.11.0",
+    "postcss-lh": "^2.0.2",
+    "postcss-type-scale": "^1.0.0",
+    "pug": "^2.0.3"
+  },
+  "dependencies": {
+    "mithril": "^1.1.6",
+    "mlib": "^1.0.0",
+    "redux": "^4.0.1"
+  }
+}

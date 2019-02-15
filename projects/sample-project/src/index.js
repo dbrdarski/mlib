@@ -1,10 +1,13 @@
-import { r, Router } from 'mlib/router';
+import mlib from '../../../src';
 import m from 'mithril';
-import Redux from 'redux';
+// import Redux from 'redux';
 
-var script = document.createElement('script');
-script.src = "https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.js";
-document.getElementsByTagName('head')[0].appendChild(script);
+const {Router, r} = mlib.Router;
+const Redux = require('redux');
+
+// var script = document.createElement('script');
+// script.src = "https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.js";
+// document.getElementsByTagName('head')[0].appendChild(script);
 
 
 // R.go('/users/dane');
@@ -33,7 +36,7 @@ var Link = {
     onclick: (e) => {
       onclick && onclick(e);
       e.preventDefault();
-      window.history.pushState({}, '', to);
+      R.match(to);
     }
   }, children)
 }
@@ -83,11 +86,11 @@ var Counter = {
 const root = [
   r('/users', {
     // resolve: ($) => !isUserLogged() ? $.redirect('/login') : $.continue(), // next(), return()
-    // onmatch: () => new Promise(
-    //   (res, rej) => {
-    //     setTimeout(res, 500)
-    //   }
-    // )
+    onmatch: () => new Promise(
+      (res, rej) => {
+        setTimeout(res, 500)
+      }
+    )
   }, [
     r('/', Counter),
     r('/:id', Hello),
@@ -122,3 +125,4 @@ function render() {
 const R = Router(root, NotFound);
 R.subscribe(render);
 store.subscribe(render);
+render();

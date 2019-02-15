@@ -1,5 +1,5 @@
-var createStore = require('./src/create-store');
-var createInstance = require('./src/create-instance');
+var createStore = require('./create-store');
+var createInstance = require('./create-instance');
 
 var container = (
   function(container, instance){
