@@ -2,16 +2,28 @@ import mlib from '../../../src';
 import m from 'mithril';
 // import Redux from 'redux';
 
-const {Router, r} = mlib.Router;
+const { Router, r } = mlib.Router;
+const { CreateState, CreateProxy } = mlib.State;
 const Redux = require('redux');
 
+// let sampleState = window.sampleState = CreateState({
+//   a: 1,
+//   b: 2,
+//   c: {
+//     d: {
+//       e: 3
+//     }
+//   },
+//   arr: [1, 2, 3, 4, 5, 6]
+// });
+//
+// sampleState.subscribe(console.log);
+//
 // var script = document.createElement('script');
 // script.src = "https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.js";
 // document.getElementsByTagName('head')[0].appendChild(script);
 
-
 // R.go('/users/dane');
-
 
 function counter(state, action) {
   if (typeof state === 'undefined') {
@@ -27,9 +39,9 @@ function counter(state, action) {
   }
 }
 
-var store = Redux.createStore(counter)
+const store = Redux.createStore(counter)
 
-var Link = {
+const Link = {
   view: ({attrs: {to, onclick, ...attrs }, children}) => m('a', {
     ...attrs,
     href: to,
@@ -40,6 +52,7 @@ var Link = {
     }
   }, children)
 }
+
 const users = {
   dane: "Dane",
   nom: 'Naumche'
@@ -47,7 +60,23 @@ const users = {
 
 const sayHi = (key) => m(Link, {to: `/users/${key}`}, `Say hi to ${users[key]}!`);
 
-var Template = {
+let input = CreateState({
+  value: ''
+});
+
+
+
+const InputField = {
+  view: () => {
+    console.log("value", input.state.value)
+    return m('input[type="text"]', {
+      value: input.state.value,
+      oninput: (e) => input.state.value = e.target.value
+    })
+  }
+}
+
+const Template = {
   view: (vnode) => m('div#app', vnode.children)
 };
 const UserList = {
@@ -59,6 +88,7 @@ const UserList = {
 const NotFound = {
   view: () => m('div', [
     m('p', 'Not found!!!!!!!'),
+    m(InputField),
     m(UserList)
   ])
 }
@@ -68,7 +98,7 @@ const Hello = {
     m(UserList)
   ])
 }
-var Counter = {
+const Counter = {
   view: (vnode) => m(
     'nav', [
       m('span#value', `${vnode.attrs.counter} times`),
@@ -99,7 +129,10 @@ const root = [
       r('/posts/:postId', Hello),
       r('/photos/:imageId', Hello)
     ])
-  ])
+  ]),
+  r('/', {
+    view: () => 'Hello'
+  })
 ];
 // var App = {
 //   view: m(Router)
@@ -108,13 +141,10 @@ const App = () => {
   const { component, params } = R.getRoute();
   const state = store.getState();
   console.log({ component, params, state })
-  return m(
-    Template,
-    m(component, {
-      params,
-      counter: state
-    })
-  );
+  return m(component, {
+    params,
+    counter: state
+  });
 };
 
 
@@ -123,6 +153,11 @@ function render() {
 }
 
 const R = Router(root, NotFound);
-R.subscribe(render);
-store.subscribe(render);
-render();
+
+document.addEventListener('DOMContentLoaded',() => {
+  input.subscribe(render);
+  R.subscribe(render);
+  store.subscribe(render);
+  render();
+  // sampleState.state.d = 4;
+});

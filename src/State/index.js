@@ -1,9 +1,11 @@
-const { isPrimitive, copyObject } = require('../Utils');
-var CreateState = (state = {}) => {
+const { isPrimitive, copyObject, emptyObject } = require('../Utils');
+const CreateState = (state = {}) => {
 	let listeners = [];
 	const subscribe = (fn) => { listeners = listeners.concat(fn) };
 	const unsubscribe = (fn) => { listeners = listeners.filter(l => l != fn) };
-	const handler = ( state ) => { listeners = listeners.map(() => ({state}) ) };
+	const handler = ( state ) => {
+		listeners.map((fn) => fn({state}) )
+	};
 	const observer = CreateProxy(state, {handler});
 
 	return {
@@ -13,16 +15,20 @@ var CreateState = (state = {}) => {
 	};
 }
 
-var CreateProxy = (record, { parent, property, handler } = {}) => {
+const isCallable = (f) => typeof f === 'function';
+
+const CreateProxy = (record, { parent, property, handler } = {}) => {
 	return new Proxy(record, {
 		get: (target, prop, parent) => {
 			var p = record[prop];
 			return isPrimitive(p)
 				? p
-				: CreateProxy(p, {
-					parent,
-					property: prop
-				});
+				: isCallable(p)
+					? p.bind(record)
+					: CreateProxy(p, {
+						parent,
+						property: prop
+					});
 		},
 		deleteProperty: (target, prop) => {
 			record = copyObject(record);
@@ -31,6 +37,10 @@ var CreateProxy = (record, { parent, property, handler } = {}) => {
 				parent[property] = record;
 			}
 		},
+		apply: (...args) => {
+			console.log({ record, args })
+			record(...args)
+		},
 		set: (target, prop, value) => {
 			record = copyObject(record);
 			record[prop] = value;
@@ -38,6 +48,7 @@ var CreateProxy = (record, { parent, property, handler } = {}) => {
 				parent[property] = record;
 			}
 			handler && handler(record);
+			return true;
 		}
 	});
 }

@@ -123,14 +123,18 @@ const createState = (state, { listeners = [] } = {}) => ({
 })(window.history);
 
 const Router = (routes, notFound = "Not found.", { onMatch, on404 } = {}) => {
-  let routerState = createState({});
+  let routerState = createState({
+    match: {
+      component: notFound
+    }
+  });
   const router = {
     subscribe: routerState.subscribe,
     getRoute: () => {
       const state = routerState.get();
       return {
         path: state.path,
-        component: state.match && state.match.component,
+        component: state.match.component,
         params: state.params
       };
     },
