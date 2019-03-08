@@ -17,7 +17,18 @@ const CreateState = (state = {}) => {
 
 const isCallable = (f) => typeof f === 'function';
 
+const getOrCreate = (childrenProxies, prop, p, parent) => {
+	if (childrenProxies[prop] == null) {
+		childrenProxies[prop] = CreateProxy(p, {
+			parent,
+			property: prop
+		});
+	}
+	return childrenProxies[prop];
+}
+
 const CreateProxy = (record, { parent, property, handler } = {}) => {
+	childrenProxies = {};
 	return new Proxy(record, {
 		get: (target, prop, parent) => {
 			var p = record[prop];
@@ -25,10 +36,7 @@ const CreateProxy = (record, { parent, property, handler } = {}) => {
 				? p
 				: isCallable(p)
 					? p.bind(record)
-					: CreateProxy(p, {
-						parent,
-						property: prop
-					});
+					: getOrCreate(childrenProxies, prop, p, parent);
 		},
 		deleteProperty: (target, prop) => {
 			record = copyObject(record);
