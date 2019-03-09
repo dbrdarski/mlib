@@ -52,9 +52,10 @@ const CreateProxy = (record, { parent, property, handler } = {}) => {
 					: getOrCreateChildrenProxies(childrenProxies, prop, p, parent);
 		},
 		deleteProperty: (target, prop) => {
+			var prevState = getDraft();
 			var draft = getDraft(true);
 			delete draft[prop];
-			if (parent != null){
+			if (parent != null && prevState !== draft){
 				parent[property] = draft;
 			}
 		},
@@ -64,9 +65,10 @@ const CreateProxy = (record, { parent, property, handler } = {}) => {
 		// },
 		apply: () => record,
 		set: (target, prop, value) => {
+			var prevState = getDraft();
 			var draft = getDraft(true);
 			draft[prop] = value;
-			if (parent != null){
+			if (parent != null && prevState !== draft){
 				parent[property] = draft;
 			}
 			handler && handler(draft);
