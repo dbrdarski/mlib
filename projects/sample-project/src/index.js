@@ -6,19 +6,6 @@ const { Router, r } = mlib.Router;
 const { CreateState, CreateProxy } = mlib.State;
 const Redux = require('redux');
 
-// let sampleState = window.sampleState = CreateState({
-//   a: 1,
-//   b: 2,
-//   c: {
-//     d: {
-//       e: 3
-//     }
-//   },
-//   arr: [1, 2, 3, 4, 5, 6]
-// });
-//
-// sampleState.subscribe(console.log);
-//
 // var script = document.createElement('script');
 // script.src = "https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.js";
 // document.getElementsByTagName('head')[0].appendChild(script);
@@ -89,9 +76,16 @@ const NotFound = {
   view: () => m('div', [
     m('p', 'Not found!!!!!!!'),
     m(InputField),
+    m('button', {
+      onclick: () => R.go(input.state.value)
+    }, 'Go!!!!'),
     m(UserList)
   ])
 }
+
+// const Connector.
+// const connect = (connectorFn) => (component) => m(component, )
+
 const Hello = {
   view: (vnode) => m('div', [
     m('p', `Hello, ${users[vnode.attrs.params.id]}!!!`),
@@ -147,6 +141,34 @@ const App = () => {
   });
 };
 
+// const Router = {
+//   view: () => {
+//     const { component, params } = R.getRoute();
+//     return m(component, { params });
+//   }
+// };
+
+// const App = () => <Router />
+
+// const connector = (fn) => {
+//   var connector = {};
+//   var listeners = [];
+//   const renderF = (dom, node) => (data)
+//   return {
+//     add: (prop, o) => {
+//       Object.defineProperty(connector, prop, {
+//         get: o.getState
+//       });
+//       listeners.push(o);
+//     },
+//     mount: (dom) => {
+//       listeners.map( v => v.subscribe(render))
+//     }
+//   }
+// }
+//
+// connector.add('store', store);
+// connector.add('router', R);
 
 function render() {
   m.render( document.body, App() );

@@ -17,7 +17,7 @@ const CreateState = (state = {}) => {
 
 const isCallable = (f) => typeof f === 'function';
 
-const getOrCreate = (childrenProxies, prop, p, parent) => {
+const getOrCreateChildrenProxies = (childrenProxies, prop, p, parent) => {
 	if (childrenProxies[prop] == null) {
 		childrenProxies[prop] = CreateProxy(p, {
 			parent,
@@ -26,9 +26,22 @@ const getOrCreate = (childrenProxies, prop, p, parent) => {
 	}
 	return childrenProxies[prop];
 }
+getOrCreateDraft = (record) => {
+	let clean = true,
+			draft = null;
+	return (mutate) => {
+		if (mutate) => {
+			draft = copyObject(record);
+			clean = false;
+		};
+		return clean ? record : draft;
+	};
+}
 
 const CreateProxy = (record, { parent, property, handler } = {}) => {
-	childrenProxies = {};
+	let childrenProxies = {},
+			getDraft = getOrCreateDraft(record);
+
 	return new Proxy(record, {
 		get: (target, prop, parent) => {
 			var p = record[prop];
@@ -36,26 +49,27 @@ const CreateProxy = (record, { parent, property, handler } = {}) => {
 				? p
 				: isCallable(p)
 					? p.bind(record)
-					: getOrCreate(childrenProxies, prop, p, parent);
+					: getOrCreateChildrenProxies(childrenProxies, prop, p, parent);
 		},
 		deleteProperty: (target, prop) => {
-			record = copyObject(record);
-			delete record[prop];
+			var draft = getDraft(true);
+			delete draft[prop];
 			if (parent != null){
-				parent[property] = record;
+				parent[property] = draft;
 			}
 		},
-		apply: (...args) => {
-			console.log({ record, args })
-			record(...args)
-		},
+		// apply: (...args) => {
+		// 	console.log({ record, args })
+		// 	record(...args)
+		// },
+		apply: () => record,
 		set: (target, prop, value) => {
-			record = copyObject(record);
-			record[prop] = value;
+			var draft = getDraft(true);
+			draft[prop] = value;
 			if (parent != null){
-				parent[property] = record;
+				parent[property] = draft;
 			}
-			handler && handler(record);
+			handler && handler(draft);
 			return true;
 		}
 	});
