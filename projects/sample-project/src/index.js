@@ -47,7 +47,7 @@ const users = {
 
 const sayHi = (key) => m(Link, {to: `/users/${key}`}, `Say hi to ${users[key]}!`);
 
-let input = CreateState({
+let input = window.input = CreateState({
   value: ''
 });
 
@@ -55,7 +55,7 @@ let input = CreateState({
 
 const InputField = {
   view: () => {
-    console.log("value", input.state.value)
+    console.log("input.state.value", input.state.value)
     return m('input[type="text"]', {
       value: input.state.value,
       oninput: (e) => input.state.value = e.target.value
@@ -134,7 +134,7 @@ const root = [
 const App = () => {
   const { component, params } = R.getRoute();
   const state = store.getState();
-  console.log({ component, params, state })
+  // console.log({ component, params, state })
   return m(component, {
     params,
     counter: state
