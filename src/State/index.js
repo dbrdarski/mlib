@@ -1,4 +1,4 @@
-const { isPrimitive, copyObject, emptyObject } = require('../Utils');
+const { isPrimitive, copyObject, emptyObject, objectMap } = require('../Utils');
 const stateDefaults = {
 	mutable: false,
 };
@@ -103,7 +103,7 @@ const CreateProxy = (record, { parent, property, handler, mutable } = {}) => {
 			if( !args.length ){
 				record = state.get({
 					op: (record) => {
-						mutable && childrenProxies.map(apply);
+						mutable && objectMap(childrenProxies, apply);
 						return Object.freeze(record);
 					},
 					mutable: false
