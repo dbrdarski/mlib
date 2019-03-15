@@ -1,4 +1,4 @@
-const { isPrimitive, copyObject, emptyObject, objectMap } = require('../Utils');
+const { isPrimitive, copy, empty, each } = require('../Utils');
 const stateDefaults = {
 	mutable: false,
 };
@@ -25,22 +25,6 @@ const CreateState = window.CreateState = (state = {}, options) => {
 
 const isCallable = (f) => typeof f === 'function';
 
-const StateGetter = (state, {parent, property} = {}) => {
-	let dirty = false;
-	return ({
-		get: ({ op, mutable }) => {
-			state = dirty ? state : copyObject(state);
-			op && op(state);
-			if ( !mutable ) {
-				if ( !dirty && parent != null ) parent[property] = state;
-			}
-			dirty = mutable;
-			return state;
-		},
-		isDirty: () => dirty
-	});
-}
-
 const spawnChildProxy = (childrenProxies, prop, p, parent, mutable) => {
 	if (childrenProxies[prop] == null) {
 		childrenProxies[prop] = CreateProxy(p, {
@@ -51,62 +35,51 @@ const spawnChildProxy = (childrenProxies, prop, p, parent, mutable) => {
 	}
 	return childrenProxies[prop];
 }
+
+// !sideEffect === lift -> returns state (snapshot)
+
+const StateGetter = (state, {parent, property, mutable} = {}) => {
+	let dirty = false;
+	return ({
+		get: ({ sideEffect, mutate, freeze }) => {
+			state = (!sideEffect || mutate && dirty && !sideEffect) ? state : copy(state);
+			console.log([!sideEffect, mutate, dirty, mutable])
+			console.log((!sideEffect || dirty) ? "NOT" : "YES")
+			sideEffect && sideEffect(state);
+			if ( !mutate ) {
+				if ( sideEffect && !dirty && parent != null ) parent[property] = state;
+			}
+			console.log({sideEffect, mutate, dirty})
+			dirty = mutate;
+			freeze && Object.freeze(state);
+			return state;
+		},
+		isDirty: () => dirty
+	});
+}
+
 const apply = (fn) => fn();
+const applyToObjectKeys = (v, k, object) => {
+	isPrimitive(v) || v();
+};
 
 const CreateProxy = (record, { parent, property, handler, mutable } = {}) => {
 	let proxy,
 			childrenProxies = {},
-			state = StateGetter(record, { parent, property });
+			state = StateGetter(record, { parent, property, mutable });
 
 	return proxy = new Proxy(new Function, {
-		get: (target, prop, parent) => {
-			let p = record[prop];
-			return isPrimitive(p)
-				? p
-				: isCallable(p)
-					? p.bind(record)
-					: spawnChildProxy(childrenProxies, prop, p, parent, mutable);
-		},
-		deleteProperty: (target, prop) => {
-			const condition = record.hasOwnProperty(prop);
-			if( condition ){
-				record = state.get({
-					op: (record) => delete record[prop],
-					mutable
-				});
-				delete childrenProxies[prop];
-				// should childrenProxies allways be deleted (for deleteProperty)?
-				mutable || handler && handler(record);
-			}
-		},
-		set: (target, prop, value) => {
-			const condition = state[prop] !== value;
-			if( condition ){
-				record = state.get({
-					op: (record) => record[prop] = value,
-					mutable
-				});
-				delete childrenProxies[prop];
-				// should childrenProxies allways be deleted (for deleteProperty)?
-				mutable || handler && handler(record);
-			}
-			return true;
-		},
-		// apply: (...args) => {
-		// 	console.log({ record, args })
-		// 	record(...args)
-		// },
 		apply: ( target, thisArg, args ) => {
 			// TODO: write the mutable resoling all temporary mutations case!!!!!!!!!!!!!!!!!!!!!!
 		  const [ fn ] = args;
 			// console.log({fn, str: fn.toSource()})
 			if( !args.length ){
 				record = state.get({
-					op: (record) => {
-						mutable && objectMap(childrenProxies, apply);
-						return Object.freeze(record);
-					},
-					mutable: false
+					sideEffect: mutable
+						? (record) => each(proxy, applyToObjectKeys)
+						: false,
+					mutate: false,
+					freeze: true
 				});
 				handler && handler(record);
 				return record;
@@ -127,7 +100,45 @@ const CreateProxy = (record, { parent, property, handler, mutable } = {}) => {
 			// 	handler && handler(record);
 			// 	return record;
 			// }
+		},
+		get: (target, prop, parent) => {
+			let p = record[prop];
+			return isPrimitive(p)
+				? p
+				: isCallable(p)
+					? p.bind(record)
+					: spawnChildProxy(childrenProxies, prop, p, parent, mutable);
+		},
+		set: (target, prop, value) => {
+			const condition = state[prop] !== value;
+			if( condition ){
+				record = state.get({
+					sideEffect: (record) => record[prop] = value,
+					mutate: mutable
+				});
+				delete childrenProxies[prop];
+				// should childrenProxies allways be deleted (for deleteProperty)?
+				mutable || handler && handler(record);
+			}
+			return true;
+		},
+		deleteProperty: (target, prop) => {
+			const condition = record.hasOwnProperty(prop);
+			if( condition ){
+				record = state.get({
+					sideEffect: (record) => delete record[prop],
+					mutate: mutable
+				});
+				delete childrenProxies[prop];
+				// should childrenProxies allways be deleted (for deleteProperty)?
+				mutable || handler && handler(record);
+			}
+
 		}
+		// apply: (...args) => {
+		// 	console.log({ record, args })
+		// 	record(...args)
+		// },
 	});
 }
 

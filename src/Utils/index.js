@@ -1,18 +1,29 @@
 export const isPrimitive = (val) => Object(val) !== val;
 export const isObject = (val) => Object(val) === val;
-export const emptyObject = (o) => o.constructor();
-export const copyObject = (o) => Object.assign(o.constructor(), o );
-export const objectFilter = (object, filterFn) => Object.keys(object).reduce(
-  (result, key) => {
-    if(filterFn(object[key], key, object)){
-      result[key] = object[key];
+export const empty = (o) => o.constructor();
+export const copy = (o) => Object.assign(o.constructor(), o );
+export const filter = (object, fn) => Object.keys(object).reduce(
+  (acc, key) => {
+    if(fn(object[key], key, object)){
+      acc[key] = object[key];
     }
-    return result;
+    return acc;
   }, {}
 );
-export const objectMap = (object, mapFn) => Object.keys(object).reduce(
-  (result, key) => {
-    result[key] = mapFn(object[key], key, object);
-    return result;
+export const map = (object, fn) => Object.keys(object).reduce(
+  (acc, key) => {
+    acc[key] = fn(object[key], key, object);
+    return acc;
   }, {}
+);
+export const reduce = (object, fn, initial) => Object.keys(object).reduce(
+  (acc, key) => {
+    acc[key] = fn(object[key], key, object);
+    return acc;
+  }, initial
+);
+export const each = (object, fn) => Object.keys(object).forEach(
+  (key) => {
+    fn(object[key], key, object);
+  }
 );
