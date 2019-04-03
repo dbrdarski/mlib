@@ -1,16 +1,69 @@
 import mlib from '../../../src';
 import m from 'mithril';
 // import Redux from 'redux';
+import { logger } from '../../../src/Utils';
 
 const { Router, r } = mlib.Router;
-const { CreateState, CreateProxy } = mlib.State;
+const { CreateState } = mlib.State;
 const Redux = require('redux');
 
+const log = window.log = logger();
+// const { state, subscribe } = CreateState({a:1, b: 2, arr: [1,2,3]})
+
+// window.state = state;
+// subscribe(
+//   ({ state }) => log(state)
+// );
+// window.CreateState = CreateState;
+//
+// // window.s1 = state()
+// // state.arr.push(13)
+// // window.s2 = state()
+// state( s => s.arr.push(101,102,103))
+// window.s3 = state()
+// state({d: 4, e: {f: 5}});
+// window.s4 = state()
+// let sampleState = window.sampleState = CreateState({
+//   a: 1,
+//   b: 2,
+//   c: {
+//     d: {
+//       e: 3
+//     }
+//   },
+//   arr: [1, 2, 3, 4, 5, 6]
+// });
+//
+// sampleState.subscribe(console.log);
+//
 // var script = document.createElement('script');
 // script.src = "https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.js";
 // document.getElementsByTagName('head')[0].appendChild(script);
 
 // R.go('/users/dane');
+// require { Component } from 'mlib';
+//
+// Component('Link', ({
+//
+// }) => class Link {
+//
+//   view(){
+//     return (
+//
+//     );
+//   }
+// })
+
+// export default ({ state, store }) => ({
+//   view() {
+//
+//   }
+// });
+//
+// connect({
+//   localState,
+//   store
+// }, Component)
 
 function counter(state, action) {
   if (typeof state === 'undefined') {
@@ -47,7 +100,7 @@ const users = {
 
 const sayHi = (key) => m(Link, {to: `/users/${key}`}, `Say hi to ${users[key]}!`);
 
-let input = window.input = CreateState({
+let input = CreateState({
   value: ''
 });
 
@@ -55,7 +108,7 @@ let input = window.input = CreateState({
 
 const InputField = {
   view: () => {
-    console.log("input.state.value", input.state.value)
+    // console.log("value", input.state.value)
     return m('input[type="text"]', {
       value: input.state.value,
       oninput: (e) => input.state.value = e.target.value
@@ -73,19 +126,12 @@ const UserList = {
   ])
 }
 const NotFound = {
-  view: () => m('div', [
+  view: (vnode) => m('div', [
     m('p', 'Not found!!!!!!!'),
     m(InputField),
-    m('button', {
-      onclick: () => R.go(input.state.value)
-    }, 'Go!!!!'),
     m(UserList)
   ])
 }
-
-// const Connector.
-// const connect = (connectorFn) => (component) => m(component, )
-
 const Hello = {
   view: (vnode) => m('div', [
     m('p', `Hello, ${users[vnode.attrs.params.id]}!!!`),
@@ -141,42 +187,13 @@ const App = () => {
   });
 };
 
-// const Router = {
-//   view: () => {
-//     const { component, params } = R.getRoute();
-//     return m(component, { params });
-//   }
-// };
-
-// const App = () => <Router />
-
-// const connector = (fn) => {
-//   var connector = {};
-//   var listeners = [];
-//   const renderF = (dom, node) => (data)
-//   return {
-//     add: (prop, o) => {
-//       Object.defineProperty(connector, prop, {
-//         get: o.getState
-//       });
-//       listeners.push(o);
-//     },
-//     mount: (dom) => {
-//       listeners.map( v => v.subscribe(render))
-//     }
-//   }
-// }
-//
-// connector.add('store', store);
-// connector.add('router', R);
-
 function render() {
   m.render( document.body, App() );
 }
 
 const R = Router(root, NotFound);
 
-document.addEventListener('DOMContentLoaded',() => {
+document.addEventListener('DOMContentLoaded', () => {
   input.subscribe(render);
   R.subscribe(render);
   store.subscribe(render);
