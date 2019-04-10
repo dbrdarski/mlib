@@ -9,7 +9,7 @@ const stateDefaults = {
 	mutable: false,
 };
 
-const CreateState = window.CreateState = (state = {}, options) => {
+const CreateState = (state = {}, options) => {
 	const { mutable } = { ...stateDefaults, ...options };
 	let listeners = [];
 	const subscribe = (fn) => { listeners = listeners.concat(fn) };
@@ -53,8 +53,15 @@ const SubProxy = (subarray, prop, subproxies, { handler, mutable }) => {
 	}
 	return subproxies[prop];
 };
-
-const CreateProxy = window.CreateProxy = (record, { handler, mutable = false }) => {
+const produce = (...args) => {
+	const [ first, second ] = args;
+	if (args.length === 1 && isCallable(first)){
+		return state => CreateProxy(state)(first)();
+	} else {
+		return CreateProxy(first)(second)()
+	}
+}
+const CreateProxy = window.CreateProxy = (record, { handler, mutable = false } = {}) => {
 	let proxy,
 			subproxies = {},
 			state = StateGuard(record, { mutable });
@@ -114,13 +121,14 @@ const CreateProxy = window.CreateProxy = (record, { handler, mutable = false }) 
 				}
 				return record;
 			} else if (args.length === 1){
-				const [stateUpdate] = args;;
+				const [stateUpdate] = args;
 				if (isCallable(stateUpdate)){
-					let p = CreateProxy(record, { mutable: true });
+					const p = CreateProxy(record, { mutable: true });
 					stateUpdate(p);
 					record = p();
 					state = StateGuard(record, { mutable });
-					handler && handler(record)
+					handler && handler(record);
+					return proxy;
 				}
 			}
 		}
