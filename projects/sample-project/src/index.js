@@ -18,7 +18,7 @@ const { state, subscribe } = CreateState({
 window.state = state;
 subscribe(
   ({ state }) => {
-    document.body.innerHTML = `<pre>${JSON.stringify(state)}</pre>`
+    document.body.innerHTML = `<pre>${JSON.stringify(state,null,'  ')}</pre>`
   }
 );
 
