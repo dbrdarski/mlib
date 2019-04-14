@@ -1,19 +1,27 @@
 import mlib from '../../../src';
 import m from 'mithril';
 // import Redux from 'redux';
-import { logger } from '../../../src/Utils';
+import { logger, pipe } from '../../../src/Utils';
 
 const { Router, r } = mlib.Router;
 const { CreateState } = mlib.State;
 const Redux = require('redux');
 
 const log = window.log = logger();
-// const { state, subscribe } = CreateState({a:1, b: 2, arr: [1,2,3]})
 
-// window.state = state;
-// subscribe(
-//   ({ state }) => log(state)
-// );
+const { state, subscribe } = CreateState({
+  a:1,
+  b: 2,
+  arr: [1,2,3]
+});
+
+window.state = state;
+subscribe(
+  ({ state }) => {
+    document.body.innerHTML = `<pre>${JSON.stringify(state)}</pre>`
+  }
+);
+
 // window.CreateState = CreateState;
 //
 // // window.s1 = state()

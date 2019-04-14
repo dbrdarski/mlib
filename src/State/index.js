@@ -53,6 +53,7 @@ const SubProxy = (subarray, prop, subproxies, { handler, mutable }) => {
 	}
 	return subproxies[prop];
 };
+<<<<<<< HEAD
 const produce = (...args) => {
 	const [ first, second ] = args;
 	if (args.length === 1 && isCallable(first)){
@@ -62,6 +63,10 @@ const produce = (...args) => {
 	}
 }
 const CreateProxy = window.CreateProxy = (record, { handler, mutable = false } = {}) => {
+=======
+
+const CreateProxy = (record, { handler, mutable = false }) => {
+>>>>>>> added Unit and Onion List to Utils
 	let proxy,
 			subproxies = {},
 			state = StateGuard(record, { mutable });
