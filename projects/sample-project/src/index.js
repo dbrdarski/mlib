@@ -18,6 +18,7 @@ const { state, subscribe } = CreateState({
 window.state = state;
 subscribe(
   ({ state }) => {
+    console.log("RENDER!")
     document.body.innerHTML = `<pre>${JSON.stringify(state,null,'  ')}</pre>`
   }
 );

@@ -4,6 +4,7 @@ export const isCallable = (f) => typeof f === 'function';
 export const pipe = (...fns) => arg => fns.reduce((acc, fn) => fn(acc), arg);
 export const empty = (o) => o.constructor();
 export const copy = (o) => Object.assign(o.constructor(), o);
+export const length = (o) => Object.keys(o).length;
 export const filter = (object, fn) => Object.keys(object).reduce(
   (acc, key) => {
     if(fn(object[key], key, object)){
@@ -96,6 +97,9 @@ export const Unit = (precision, { ratio, offset }) => {
   });
 };
 
+const mapOnionList = (acc, item) => new OnionList(fn(item), acc);
+const filterOnionList = (acc, item) => fn(item) ? new OnionList(item, acc) : acc;
+const reverseOnionList = (acc, item) => new OnionList(this.head, acc);
 export class OnionList {
   constructor(head, tail){
     this.head = head;
@@ -122,18 +126,18 @@ export class OnionList {
     );
   }
   map(fn) {
-    return this.reduceRight((acc, item) => new OnionList(fn(item), acc));
+    return this.reduceRight(mapOnionList);
   }
   mapRight(fn) {
-    return this.reduce((acc, item) => new OnionList(fn(item), acc));
+    return this.reduce(mapOnionList);
   }
   filter(fn) {
-    return this.reduceRight((acc, item) => fn(item) ? new OnionList(item, acc) : acc);
+    return this.reduceRight(filterOnionList);
   }
   filterRight(fn) {
-    return this.reduce((acc, item) => fn(item) ? new OnionList(item, acc) : acc);
+    return this.reduce(filterOnionList);
   }
   reverse() {
-    return this.reduceRight((acc, item) => new OnionList(this.head, acc));
+    return this.reduceRight(reverseOnionList);
   }
 }
