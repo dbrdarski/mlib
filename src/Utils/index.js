@@ -102,10 +102,10 @@ export class OnionList {
     this.head = head;
     this.tail = tail;
     // this.length = this.tail != null ? this.tail.length + 1 : 0;
-    Object.freeze(this)
+    Object.freeze(this);
   }
   add(item) {
-    return new OnionList(item, this);
+    return new this.constructor(item, this);
   }
   reduceRight(fn, acc) {
     acc = fn(acc, this.head);
@@ -123,18 +123,18 @@ export class OnionList {
     );
   }
   map(fn) {
-    return this.reduceRight((acc, item) => new OnionList(fn(item), acc));
+    return this.reduceRight((acc, item) => new this.constructor (fn(item), acc));
   }
   mapRight(fn) {
-    return this.reduce((acc, item) => new OnionList(fn(item), acc));
+    return this.reduce((acc, item) => new this.constructor (fn(item), acc));
   }
   filter(fn) {
-    return this.reduceRight((acc, item) => fn(item) ? new OnionList(item, acc) : acc);
+    return this.reduceRight((acc, item) => fn(item) ? new this.constructor (item, acc) : acc);
   }
   filterRight(fn) {
-    return this.reduce((acc, item) => fn(item) ? new OnionList(item, acc) : acc);
+    return this.reduce((acc, item) => fn(item) ? new this.constructor (item, acc) : acc);
   }
   reverse() {
-    return this.reduceRight((acc, item) => new OnionList(this.head, acc));
+    return this.reduceRight((acc, item) => new this.constructor (this.head, acc));
   }
 }
