@@ -97,9 +97,6 @@ export const Unit = (precision, { ratio, offset }) => {
   });
 };
 
-const mapOnionList = (acc, item) => new OnionList(fn(item), acc);
-const filterOnionList = (acc, item) => fn(item) ? new OnionList(item, acc) : acc;
-const reverseOnionList = (acc, item) => new OnionList(this.head, acc);
 export class OnionList {
   constructor(head, tail){
     this.head = head;
@@ -126,18 +123,18 @@ export class OnionList {
     );
   }
   map(fn) {
-    return this.reduceRight(mapOnionList);
+    return this.reduceRight((acc, item) => new OnionList(fn(item), acc));
   }
   mapRight(fn) {
-    return this.reduce(mapOnionList);
+    return this.reduce((acc, item) => new OnionList(fn(item), acc));
   }
   filter(fn) {
-    return this.reduceRight(filterOnionList);
+    return this.reduceRight((acc, item) => fn(item) ? new OnionList(item, acc) : acc);
   }
   filterRight(fn) {
-    return this.reduce(filterOnionList);
+    return this.reduce((acc, item) => fn(item) ? new OnionList(item, acc) : acc);
   }
   reverse() {
-    return this.reduceRight(reverseOnionList);
+    return this.reduceRight((acc, item) => new OnionList(this.head, acc));
   }
 }
