@@ -57,22 +57,19 @@ renderField(field){
   });
 }
 
-renderGameMap(gamemap){
-  return m('table.game-table', [
-    m('tbody', gamemap.map( row =>
-      m('tr.game-tr', row.map( field =>
-        m('tr.game-td',
-          renderField(field)
-        )
-      )
-    ))
-  ]);
-}
 
-var gamemap = new Map(30, 20);
+var gamemap = new GameMap(30, 20);
 
 const Game = {
   view(){
-    return renderGameMap(gamemap);
+    return m('table.game-table', [
+      m('tbody', gamemap.map( row =>
+        m('tr.game-tr', row.map( field =>
+          m('tr.game-td',
+            renderField(field)
+          )
+        )
+      ))
+    ]);
   }
 }

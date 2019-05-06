@@ -4,24 +4,9 @@ import m from 'mithril';
 import { logger, pipe } from '../../../src/Utils';
 
 const { Router, r } = mlib.Router;
-const { CreateState } = mlib.State;
 const Redux = require('redux');
 
 const log = window.log = logger();
-
-const { state, subscribe } = CreateState({
-  a:1,
-  b: 2,
-  arr: [1,2,3]
-});
-
-window.state = state;
-subscribe(
-  ({ state }) => {
-    console.log("RENDER!")
-    document.body.innerHTML = `<pre>${JSON.stringify(state,null,'  ')}</pre>`
-  }
-);
 
 // window.CreateState = CreateState;
 //
@@ -74,22 +59,6 @@ subscribe(
 //   store
 // }, Component)
 
-function counter(state, action) {
-  if (typeof state === 'undefined') {
-    return 0
-  }
-  switch (action.type) {
-    case 'INCREMENT':
-      return state + 1
-    case 'DECREMENT':
-      return state - 1
-    default:
-      return state
-  }
-}
-
-const store = Redux.createStore(counter)
-
 const Link = {
   view: ({attrs: {to, onclick, ...attrs }, children}) => m('a', {
     ...attrs,
@@ -102,65 +71,9 @@ const Link = {
   }, children)
 }
 
-const users = {
-  dane: "Dane",
-  nom: 'Naumche'
-}
-
-const sayHi = (key) => m(Link, {to: `/users/${key}`}, `Say hi to ${users[key]}!`);
-
-let input = CreateState({
-  value: ''
-});
-
-
-
-const InputField = {
-  view: () => {
-    // console.log("value", input.state.value)
-    return m('input[type="text"]', {
-      value: input.state.value,
-      oninput: (e) => input.state.value = e.target.value
-    })
-  }
-}
-
 const Template = {
   view: (vnode) => m('div#app', vnode.children)
 };
-const UserList = {
-  view: () => m('nav', [
-    sayHi('dane'),
-    sayHi('nom')
-  ])
-}
-const NotFound = {
-  view: (vnode) => m('div', [
-    m('p', 'Not found!!!!!!!'),
-    m(InputField),
-    m(UserList)
-  ])
-}
-const Hello = {
-  view: (vnode) => m('div', [
-    m('p', `Hello, ${users[vnode.attrs.params.id]}!!!`),
-    m(UserList)
-  ])
-}
-const Counter = {
-  view: (vnode) => m(
-    'nav', [
-      m('span#value', `${vnode.attrs.counter} times`),
-      m('button#inc', {
-        onclick: () => store.dispatch({ type: 'INCREMENT' })
-      }, '+'),
-      m('button#dec', {
-        onclick: () => store.dispatch({ type: 'DECREMENT' })
-      }, '-'),
-      m(UserList)
-    ]
-  )
-}
 
 const root = [
   r('/users', {
