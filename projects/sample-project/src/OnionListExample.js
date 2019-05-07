@@ -42,7 +42,7 @@ class GameMap {
   }
 }
 
-renderField(field){
+const renderField = (field) => {
   const { building } = field.state;
   let color = building === 'wall'
     ? '#333'
@@ -54,21 +54,19 @@ renderField(field){
     style: {
       color
     }
-  });
+  }, '');
 }
 
 
 var gamemap = new GameMap(30, 20);
 
-const Game = {
+export const Game = {
   view(){
     return m('table.game-table', [
       m('tbody', gamemap.map( row =>
         m('tr.game-tr', row.map( field =>
-          m('tr.game-td',
-            renderField(field)
-          )
-        )
+          m('tr.game-td', [ renderField(field) ])
+        ))
       ))
     ]);
   }

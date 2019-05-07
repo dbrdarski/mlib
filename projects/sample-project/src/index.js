@@ -2,9 +2,37 @@ import mlib from '../../../src';
 import m from 'mithril';
 // import Redux from 'redux';
 import { logger, pipe } from '../../../src/Utils';
+import Hello from './common/Hello';
+import NotFound from './common/NotFound';
+import { input } from './common/InputField';
+import Counter from './Counter';
+import { GameMap } from './OnionListExample';
 
 const { Router, r } = mlib.Router;
-const Redux = require('redux');
+// const Redux = require('redux');
+
+
+const root = [
+  r('/users', {
+    // resolve: ($) => !isUserLogged() ? $.redirect('/login') : $.continue(), // next(), return()
+    onmatch: () => new Promise(
+      (res, rej) => {
+        setTimeout(res, 500)
+      }
+    )
+  }, [
+    r('/', Counter),
+    r('/:id', Hello),
+    r('/:id/:filter', Hello),
+    r('/:userId', [
+      r('/posts/:postId', Hello),
+      r('/photos/:imageId', Hello)
+    ])
+  ]),
+  r('/', {
+    view: () => 'Hello'
+  })
+];
 
 const log = window.log = logger();
 
@@ -75,27 +103,6 @@ const Template = {
   view: (vnode) => m('div#app', vnode.children)
 };
 
-const root = [
-  r('/users', {
-    // resolve: ($) => !isUserLogged() ? $.redirect('/login') : $.continue(), // next(), return()
-    onmatch: () => new Promise(
-      (res, rej) => {
-        setTimeout(res, 500)
-      }
-    )
-  }, [
-    r('/', Counter),
-    r('/:id', Hello),
-    r('/:id/:filter', Hello),
-    r('/:userId', [
-      r('/posts/:postId', Hello),
-      r('/photos/:imageId', Hello)
-    ])
-  ]),
-  r('/', {
-    view: () => 'Hello'
-  })
-];
 // var App = {
 //   view: m(Router)
 // }

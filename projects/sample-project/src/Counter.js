@@ -1,3 +1,5 @@
+const Redux = require('redux');
+
 function counter(state, action) {
   if (typeof state === 'undefined') {
     return 0
