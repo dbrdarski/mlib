@@ -109,9 +109,26 @@ const App = () => {
   });
 };
 
+// @connect({ R, state, store })
+// class App {
+//   // console.log({ component, params, state })
+//   view: () => {
+//     const { component, params } = R.getRoute();
+//     return m(component, {
+//       counter: store.getState(),
+//       params
+//     });
+//   };
+// }
+
 function render() {
   m.render( document.body, App() );
 }
+
+// function render() {
+//   m.render( document.body, m(App));
+// }
+//
 
 const R = Router(root, NotFound);
 
