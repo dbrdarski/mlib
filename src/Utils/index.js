@@ -80,7 +80,7 @@ export const curry = (f) => {
 export const Unit = (precision, { ratio, offset, f = Math.round }) => {
   const fraction = 1 / precision;
   const round = (value, depth = precision) => f(value * depth) / depth;
-  const convert = ({ratio = 1, offset = 0}, value, direction = 1) => ratio ** direction * value + offset * direction;
+  const convert = ({ratio = 1, offset = 0}, value, invert = false) => invert ? ( value - offset ) / ratio : value * ratio + offset;
   const create = (value, unit) => round(unit ? convert(create, convert(unit, value, -1)) : value, precision);
   const inc = (value) => round(value + fraction);
   const dec = (value) => round(value - fraction);
