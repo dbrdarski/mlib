@@ -61,22 +61,6 @@ export const curry = (f) => {
   }
 }
 
-// export const Unit = (depth, { ratio }) => {
-//   const unit = 1 / depth;
-//   const round = (value, { ratio = 1 } = {}) => Math.round(value * depth / ratio) / depth;
-//   const inc = (value) => round(value + unit);
-//   const dec = (value) => round(value - unit);
-//   const convertFrom = curry((unit, value) => round(value * round.ratio, unit));
-//   const convertTo = curry((unit, value) => unit(value * unit.ratio, round));
-//   return Object.defineProperties(round, {
-//     ratio: {value: ratio},
-//     inc: {value: inc},
-//     dec: {value: dec},
-//     convertTo: {value: convertTo},
-//     convertFrom: {value: convertFrom}
-//   });
-// };
-
 export const Unit = (precision, { ratio, offset, f = Math.round }) => {
   const fraction = 1 / precision;
   const round = (value, depth = precision) => f(value * depth) / depth;
