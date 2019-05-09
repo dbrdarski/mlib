@@ -77,13 +77,13 @@ export const curry = (f) => {
 //   });
 // };
 
-export const Unit = (precision, { ratio, offset }) => {
-  const unit = 1 / precision;
-  const round = (value, depth) => Math.round(value * depth) / depth;
+export const Unit = (precision, { ratio, offset, f = Math.round }) => {
+  const fraction = 1 / precision;
+  const round = (value, depth) => f(value * depth) / depth;
   const convert = ({ratio = 1, offset = 0}, value, direction = 1) => ratio ** direction * value + offset * direction;
   const create = (value, unit) => round(unit ? convert(create, convert(unit, value, -1)) : value, precision);
-  const inc = (value) => round(value + unit);
-  const dec = (value) => round(value - unit);
+  const inc = (value) => round(value + fraction, precision);
+  const dec = (value) => round(value - fraction, precision);
   const convertFrom = curry((unit, value) => create(value, unit));
   const convertTo = curry((unit, value) => unit(value, create));
   return Object.defineProperties(create, {
